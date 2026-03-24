@@ -287,6 +287,7 @@ function renderSessionDetailPanel(
           class="btn btn--sm btn--ghost"
           @click=${onClose}
           title=${t("usage.details.close")}
+          aria-label=${t("usage.details.close")}
         >
           ×
         </button>
@@ -1026,6 +1027,7 @@ function renderSessionLogsCompact(
         <select
           multiple
           size="4"
+          aria-label="Filter by role"
           @change=${(event: Event) =>
             onFilterRolesChange(
               Array.from((event.target as HTMLSelectElement).selectedOptions).map(
@@ -1041,6 +1043,7 @@ function renderSessionLogsCompact(
         <select
           multiple
           size="4"
+          aria-label="Filter by tool"
           @change=${(event: Event) =>
             onFilterToolsChange(
               Array.from((event.target as HTMLSelectElement).selectedOptions).map(
@@ -1065,6 +1068,7 @@ function renderSessionLogsCompact(
         <input
           type="text"
           placeholder=${t("usage.details.searchConversation")}
+          aria-label=${t("usage.details.searchConversation")}
           .value=${filters.query}
           @input=${(event: Event) => onFilterQueryChange((event.target as HTMLInputElement).value)}
         />

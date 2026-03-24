@@ -451,6 +451,11 @@
 .agent-chat__toolbar .btn--ghost svg {
   width: 16px;
   height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .agent-chat__input-btn:hover:not(:disabled),

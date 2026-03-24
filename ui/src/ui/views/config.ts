@@ -1,5 +1,6 @@
 import { html, nothing, type TemplateResult } from "lit";
 import { icons } from "../icons.ts";
+import { BORDER_RADIUS_STOPS, type BorderRadiusStop } from "../storage.ts";
 import type { ThemeTransitionContext } from "../theme-transition.ts";
 import type { ThemeMode, ThemeName } from "../theme.ts";
 import type { ConfigUiHints } from "../types.ts";
@@ -12,6 +13,14 @@ import {
   type JsonSchema,
 } from "./config-form.shared.ts";
 import { analyzeConfigSchema, renderConfigForm, SECTION_META } from "./config-form.ts";
+
+const BORDER_RADIUS_LABELS: Record<BorderRadiusStop, string> = {
+  0: "None",
+  25: "Slight",
+  50: "Default",
+  75: "Round",
+  100: "Full",
+};
 
 export type ConfigProps = {
   raw: string;
@@ -592,43 +601,23 @@ function renderAppearanceSection(props: ConfigProps) {
       <div class="settings-appearance__section">
         <h3 class="settings-appearance__heading">Roundness</h3>
         <p class="settings-appearance__hint">Adjust corner radius across the UI.</p>
-        <div class="settings-slider">
-          <div class="settings-slider__header">
-            <span class="settings-slider__label">
-              <span class="settings-slider__key-swatch settings-slider__key-swatch--sharp"></span>
-              Square
-            </span>
-            <span class="settings-slider__value">${props.borderRadius}%</span>
-            <span class="settings-slider__label">
-              Round
-              <span class="settings-slider__key-swatch settings-slider__key-swatch--round"></span>
-            </span>
-          </div>
-          <input
-            type="range"
-            class="settings-slider__input"
-            min="0"
-            max="100"
-            step="1"
-            .value=${String(props.borderRadius)}
-            @input=${(e: Event) => {
-              const v = Number((e.target as HTMLInputElement).value);
-              props.setBorderRadius(v);
-            }}
-          />
-          <div class="settings-slider__preview">
-            <div
-              class="settings-slider__preview-swatch"
-              style="border-radius: ${Math.round(10 * (props.borderRadius / 50))}px"
-            ></div>
-            <div
-              class="settings-slider__preview-swatch"
-              style="border-radius: ${Math.round(14 * (props.borderRadius / 50))}px"
-            ></div>
-            <div
-              class="settings-slider__preview-swatch"
-              style="border-radius: ${Math.round(20 * (props.borderRadius / 50))}px"
-            ></div>
+        <div class="settings-roundness">
+          <div class="settings-roundness__options">
+            ${BORDER_RADIUS_STOPS.map(
+              (stop) => html`
+                <button
+                  type="button"
+                  class="settings-roundness__btn ${stop === props.borderRadius ? "active" : ""}"
+                  @click=${() => props.setBorderRadius(stop)}
+                >
+                  <span
+                    class="settings-roundness__swatch"
+                    style="border-radius: ${Math.round(10 * (stop / 50))}px"
+                  ></span>
+                  <span class="settings-roundness__label">${BORDER_RADIUS_LABELS[stop]}</span>
+                </button>
+              `,
+            )}
           </div>
         </div>
       </div>
