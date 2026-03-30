@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Container version="2">
+  <Name>openclaw-tower</Name>
+  <Repository>openclaw-nullifyr:latest</Repository>
+  <Network>bridge</Network>
+  <MyIP />
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/nullifyr/openclaw</Support>
+  <Project>https://github.com/nullifyr/openclaw</Project>
+  <Overview>Custom OpenClaw Tower runtime built from the local GitHub fork and a tiny Tower-specific overlay.</Overview>
+  <Category>Tools:Utilities</Category>
+  <WebUI>http://[IP]:[PORT:18789]/</WebUI>
+  <Icon>https://raw.githubusercontent.com/openclaw/openclaw/main/docs/static/img/logo.png</Icon>
+  <ExtraParams>--restart=unless-stopped --hostname=openclaw-tower --log-opt max-size=50m --log-opt max-file=1</ExtraParams>
+  <Config Name="Web UI Port" Target="18789" Default="18790" Mode="tcp" Description="Host port that maps to the OpenClaw gateway inside the container." Type="Port" Display="always" Required="true" Mask="false">18790</Config>
+  <Config Name="Config Path" Target="/home/node/.openclaw" Default="/mnt/cache/appdata/openclaw-tower/config" Mode="rw" Description="Persistent OpenClaw config/state path on cache." Type="Path" Display="always" Required="true" Mask="false">/mnt/cache/appdata/openclaw-tower/config</Config>
+  <Config Name="Workspace Path" Target="/home/node/.openclaw/workspace" Default="/mnt/cache/appdata/openclaw-tower/workspace" Mode="rw" Description="Persistent workspace, memory, skills, and project files." Type="Path" Display="always" Required="true" Mask="false">/mnt/cache/appdata/openclaw-tower/workspace</Config>
+  <Config Name="Docker Socket" Target="/var/run/docker.sock" Default="/var/run/docker.sock" Mode="rw" Description="Optional Docker socket passthrough for local Docker-aware tooling." Type="Path" Display="always" Required="false" Mask="false">/var/run/docker.sock</Config>
+  <Config Name="BudTrak Data Path" Target="/mnt/cache/data/dispensary-tracker" Default="/mnt/cache/data/dispensary-tracker" Mode="rw" Description="BudTrak data share mounted for Tower-local review and repair tasks." Type="Path" Display="always" Required="false" Mask="false">/mnt/cache/data/dispensary-tracker</Config>
+  <Config Name="BudTrak Build Path" Target="/mnt/cache/tmp/budtrak-build" Default="/mnt/cache/tmp/budtrak-build" Mode="rw" Description="Temporary BudTrak build workspace mounted into OpenClaw for local repair flows." Type="Path" Display="advanced" Required="false" Mask="false">/mnt/cache/tmp/budtrak-build</Config>
+  <Config Name="Timezone" Target="TZ" Default="America/Phoenix" Mode="" Description="Container timezone." Type="Variable" Display="always" Required="true" Mask="false">America/Phoenix</Config>
+  <Config Name="Gateway Password" Target="OPENCLAW_GATEWAY_PASSWORD" Default="" Mode="" Description="Gateway password for the Tower OpenClaw runtime." Type="Variable" Display="always" Required="true" Mask="true" />
+  <Config Name="Google API Key" Target="GOOGLE_API_KEY" Default="" Mode="" Description="Used by Gemini-backed memory/embedding paths when configured." Type="Variable" Display="advanced" Required="false" Mask="true" />
+  <Config Name="Anthropic API Key" Target="ANTHROPIC_API_KEY" Default="" Mode="" Description="Optional Anthropic runtime fallback key." Type="Variable" Display="advanced" Required="false" Mask="true" />
+  <Config Name="OpenAI API Key" Target="OPENAI_API_KEY" Default="" Mode="" Description="Optional OpenAI runtime fallback key." Type="Variable" Display="advanced" Required="false" Mask="true" />
+  <Config Name="Container Hint" Target="OPENCLAW_CONTAINER_HINT" Default="openclaw-tower" Mode="" Description="Improves container-targeted CLI guidance inside the runtime." Type="Variable" Display="advanced" Required="false" Mask="false">openclaw-tower</Config>
+</Container>

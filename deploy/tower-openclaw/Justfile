@@ -1,0 +1,32 @@
+set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
+
+project := justfile_directory()
+
+_default:
+    @just --list
+
+fork-sync:
+    {{project}}/scripts/sync_fork.sh
+
+update-and-deploy:
+    {{project}}/scripts/update_and_deploy.sh
+
+render-template:
+    python3 {{project}}/scripts/render_unraid_template.py
+
+smoke-spec:
+    test -f {{project}}/deploy/unraid/openclaw-tower.xml
+    shellcheck {{project}}/scripts/*.sh
+    python3 -m py_compile {{project}}/scripts/render_unraid_template.py
+
+build-overlay-local base_image="openclaw-nullifyr-base:latest" image="openclaw-nullifyr:latest":
+    docker build --build-arg BASE_IMAGE={{base_image}} -t {{image}} {{project}}
+
+tower-deploy:
+    {{project}}/scripts/deploy_tower.sh
+
+tower-deploy-no-sync:
+    SKIP_SYNC=1 {{project}}/scripts/deploy_tower.sh
+
+tower-recreate:
+    {{project}}/scripts/recreate_tower_container.sh
