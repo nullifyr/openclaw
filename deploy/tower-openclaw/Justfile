@@ -11,6 +11,12 @@ fork-sync:
 update-and-deploy:
     {{project}}/scripts/update_and_deploy.sh
 
+smoke-check:
+    {{project}}/scripts/smoke_check.sh
+
+update-deploy-smoke:
+    {{project}}/scripts/update_deploy_smoke.sh
+
 render-template:
     python3 {{project}}/scripts/render_unraid_template.py
 

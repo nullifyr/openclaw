@@ -17,9 +17,11 @@ This deploy kit separates four concerns that were previously getting mixed toget
 - `Dockerfile` — tiny overlay image built on top of the fork-built base image
 - `scripts/tower-openclaw-entrypoint.sh` — startup wrapper for durable Tower-specific behavior
 - `scripts/sync_fork.sh` — fast-forward local fork from upstream and push to GitHub fork
-- `scripts/deploy_tower.sh` — rsync fork + overlay to Tower, build images, smoke test, recreate container
+- `scripts/deploy_tower.sh` — rsync fork + overlay to Tower, build images, recreate container
 - `scripts/recreate_tower_container.sh` — canonical Docker run/recreate path for Tower
 - `scripts/render_unraid_template.py` — generate the Unraid XML template
+- `scripts/smoke_check.sh` — post-deploy health/cron/skill/template checks on Tower
+- `scripts/update_deploy_smoke.sh` — sync from upstream, deploy, then run the smoke check
 - `deploy/unraid/openclaw-tower.xml` — generated template artifact
 - `container.env.example` — example runtime env file shape
 
@@ -57,6 +59,13 @@ Single-command updater from upstream all the way to Tower recreate:
 ```bash
 cd projects/openclaw-fork/deploy/tower-openclaw
 just update-and-deploy
+```
+
+Single-command updater + deploy + smoke check:
+
+```bash
+cd projects/openclaw-fork/deploy/tower-openclaw
+just update-deploy-smoke
 ```
 
 If the fork is already synced and you only changed overlay/deploy tooling:
