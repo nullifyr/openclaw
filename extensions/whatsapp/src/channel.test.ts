@@ -204,6 +204,42 @@ describe("whatsappPlugin outbound sendMedia", () => {
     );
   });
 
+  it("forwards replyToParticipant as quotedMessageKey participant on group sends", async () => {
+    const sendWhatsApp = vi.fn(async () => ({
+      messageId: "msg-1",
+      toJid: "120363000000000000@g.us",
+    }));
+
+    const outbound = whatsappPlugin.outbound;
+    if (!outbound?.sendText) {
+      throw new Error("whatsapp outbound sendText is unavailable");
+    }
+
+    await outbound.sendText({
+      cfg: {} as never,
+      to: "120363000000000000@g.us",
+      text: "reply",
+      replyToId: "quoted-1",
+      replyToParticipant: "+15551234567",
+      accountId: "default",
+      deps: { sendWhatsApp },
+    });
+
+    expect(sendWhatsApp).toHaveBeenCalledWith(
+      "120363000000000000@g.us",
+      "reply",
+      expect.objectContaining({
+        quotedMessageKey: {
+          id: "quoted-1",
+          remoteJid: "120363000000000000@g.us",
+          fromMe: false,
+          participant: "15551234567@s.whatsapp.net",
+        },
+        verbose: false,
+      }),
+    );
+  });
+
   it("quotes only the first chunk on sendFormattedText when replyToMode is first", async () => {
     const sendWhatsApp = vi.fn(
       async (_to: string, _text: string, _options: { quotedMessageKey?: unknown }) => ({

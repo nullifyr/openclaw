@@ -34,15 +34,21 @@ type WhatsAppChunker = NonNullable<ChannelOutboundAdapter["chunker"]>;
 type WhatsAppSendMessage = PluginRuntimeChannel["whatsapp"]["sendMessageWhatsApp"];
 type WhatsAppSendPoll = PluginRuntimeChannel["whatsapp"]["sendPollWhatsApp"];
 
-function resolveQuotedMessageKey(replyToId: string | null | undefined, to: string) {
+function resolveQuotedMessageKey(
+  replyToId: string | null | undefined,
+  replyToParticipant: string | null | undefined,
+  to: string,
+) {
   const quotedId = replyToId?.trim();
   if (!quotedId) {
     return undefined;
   }
+  const quotedParticipant = replyToParticipant?.trim();
   return {
     id: quotedId,
     remoteJid: toWhatsappJid(to),
     fromMe: false,
+    ...(quotedParticipant ? { participant: toWhatsappJid(quotedParticipant) } : {}),
   };
 }
 
@@ -94,6 +100,7 @@ export function createWhatsAppOutboundBase({
     deps,
     gifPlayback,
     replyToId,
+    replyToParticipant,
   }: Parameters<NonNullable<ChannelOutboundAdapter["sendText"]>>[0]) => {
     const normalizedText = normalizeText(text);
     if (skipEmptyText && !normalizedText) {
@@ -106,7 +113,7 @@ export function createWhatsAppOutboundBase({
       cfg,
       accountId: accountId ?? undefined,
       gifPlayback,
-      quotedMessageKey: resolveQuotedMessageKey(replyToId, to),
+      quotedMessageKey: resolveQuotedMessageKey(replyToId, replyToParticipant, to),
     });
   };
 
@@ -120,6 +127,7 @@ export function createWhatsAppOutboundBase({
     deps,
     gifPlayback,
     replyToId,
+    replyToParticipant,
   }: Parameters<NonNullable<ChannelOutboundAdapter["sendMedia"]>>[0]) => {
     const send =
       resolveOutboundSendDep<WhatsAppSendMessage>(deps, "whatsapp") ?? sendMessageWhatsApp;
@@ -130,7 +138,7 @@ export function createWhatsAppOutboundBase({
       mediaLocalRoots,
       accountId: accountId ?? undefined,
       gifPlayback,
-      quotedMessageKey: resolveQuotedMessageKey(replyToId, to),
+      quotedMessageKey: resolveQuotedMessageKey(replyToId, replyToParticipant, to),
     });
   };
 
@@ -151,6 +159,7 @@ export function createWhatsAppOutboundBase({
       deps,
       gifPlayback,
       replyToId,
+      replyToParticipant,
       abortSignal,
     }) => {
       throwIfAborted(abortSignal);
@@ -159,12 +168,22 @@ export function createWhatsAppOutboundBase({
       });
       if (limit === undefined) {
         return attachChannelToResults("whatsapp", [
-          await sendTextRaw({ cfg, to, text, accountId, deps, gifPlayback, replyToId }),
+          await sendTextRaw({
+            cfg,
+            to,
+            text,
+            accountId,
+            deps,
+            gifPlayback,
+            replyToId,
+            replyToParticipant,
+          }),
         ]);
       }
 
       const replyToMode = resolveEffectiveReplyToMode(cfg, accountId);
       let nextReplyToId = replyToId;
+      let nextReplyToParticipant = replyToParticipant;
       const results: Array<Awaited<ReturnType<typeof sendTextRaw>>> = [];
       const sendChunk = async (chunk: string) => {
         throwIfAborted(abortSignal);
@@ -176,10 +195,12 @@ export function createWhatsAppOutboundBase({
           deps,
           gifPlayback,
           replyToId: nextReplyToId,
+          replyToParticipant: nextReplyToParticipant,
         });
         results.push(result);
         if (nextReplyToId && replyToMode === "first") {
           nextReplyToId = undefined;
+          nextReplyToParticipant = undefined;
         }
       };
 
